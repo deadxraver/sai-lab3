@@ -1,5 +1,22 @@
 import math
 from random import shuffle
+import matplotlib.pyplot as plt
+
+
+def calculate_quantile(data, q):
+	sorted_data = sorted(data)
+	n = len(sorted_data)
+	index = q * (n - 1)
+
+	lower_index = int(index)
+	upper_index = lower_index + 1
+
+	if upper_index >= n:
+		return sorted_data[lower_index]
+
+	weight = index - lower_index
+	return sorted_data[lower_index] * (1 - weight) + sorted_data[upper_index] * weight
+
 
 s = ""
 header = []
@@ -18,13 +35,23 @@ for i in range(len(header)):
 # 1 grafiki
 number = len(s)
 avg = sum(table['median_house_value']) / number
-standart_otkl = math.sqrt(sum((x-avg)**2 for x in table['median_house_value']) / (number - 1))
+standart_otkl = math.sqrt(sum((x - avg) ** 2 for x in table['median_house_value']) / (number - 1))
 minimum = min(table['median_house_value'])
 maximum = max(table['median_house_value'])
 
-# TODO: kvantili
+quantile5 = calculate_quantile(table['median_house_value'], 0.05)
+quantile25 = calculate_quantile(table['median_house_value'], 0.25)
+quantile95 = calculate_quantile(table['median_house_value'], 0.95)
 
-print(number, avg, standart_otkl, minimum, maximum)
+print(f"{number=}, {avg=}, {standart_otkl=}, {minimum=}, {maximum=}, {quantile5=}, {quantile25=}")
+
+plt.hist(table['median_house_value'], bins=50)
+plt.axvline(avg, color='red', label='среднее')
+plt.axvline(quantile5, color='green', label='квантиль 5%')
+plt.axvline(quantile25, color='orange', label='квантиль 25%')
+plt.axvline(quantile95, color='yellow', label='квантиль 95%')
+plt.legend()
+plt.show()
 
 # 3 razdeleniye
 shuffle(s)
