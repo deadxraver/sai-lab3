@@ -1,5 +1,7 @@
 import math
 from random import shuffle
+from typing import Any
+
 import matplotlib.pyplot as plt
 
 
@@ -18,8 +20,8 @@ def calculate_quantile(data, q):
 	return sorted_data[lower_index] * (1 - weight) + sorted_data[upper_index] * weight
 
 
-s = ""
-header = []
+s: Any
+header: list[str]
 with open("california_housing_train.csv") as f:
 	s = f.readlines()
 	header = s.pop(0).replace('"', '').replace('\n', '').split(';')
