@@ -1,6 +1,5 @@
 import math
 from random import shuffle
-from typing import Any
 
 import matplotlib.pyplot as plt
 
@@ -20,22 +19,31 @@ def calculate_quantile(data, q):
 	return sorted_data[lower_index] * (1 - weight) + sorted_data[upper_index] * weight
 
 
-s: Any
+dataset = list()
 header: list[str]
+invalid_cnt = 0
 with open("california_housing_train.csv") as f:
 	s = f.readlines()
 	header = s.pop(0).replace('"', '').replace('\n', '').split(';')
 	for i in range(len(s)):
-		s[i] = list(map(float, s[i].split(';')))
+		try:
+			dataset.append(list(map(float, s[i].split(';'))))
+		except:
+			invalid_cnt += 1
+
+if invalid_cnt > 0:
+	print(f'нашли {invalid_cnt} невалидных строк')
+else:
+	print('все строки валидны')
 
 table = {}
 for i in range(len(header)):
 	table[header[i]] = []
-	for j in range(len(s)):
-		table[header[i]].append(s[j][i])
+	for j in range(len(dataset)):
+		table[header[i]].append(dataset[j][i])
 
 # 1 grafiki
-number = len(s)
+number = len(dataset)
 avg = sum(table['median_house_value']) / number
 standart_otkl = math.sqrt(sum((x - avg) ** 2 for x in table['median_house_value']) / (number - 1))
 minimum = min(table['median_house_value'])
