@@ -19,6 +19,24 @@ def calculate_quantile(data, q):
 	return sorted_data[lower_index] * (1 - weight) + sorted_data[upper_index] * weight
 
 
+def transponate(X):
+	return [[X[j][i] for j in range(len(X))] for i in range(len(X[0]))]
+
+
+def multiply(X, Y):
+	XY = []
+	for i in range(len(X)):
+		row = []
+		for j in range(len(Y[0])):
+			row.append(sum(X[i][k] * Y[k][j] for k in range(len(Y))))
+		XY.append(row)
+	return XY
+
+
+def obrat(X):
+	... # надо вспомнить
+
+
 dataset = list()
 header: list[str]
 invalid_cnt = 0
@@ -78,3 +96,15 @@ for i in range(len(header)):
 		testing[header[i]].append(testing_s[j][i])
 	for j in range(len(learning_s)):
 		learning[header[i]].append(learning_s[j][i])
+
+# 1 - зависимость от местоположения (longitude, latitude)
+S = table['median_house_value']  # вектор наблюдений зависимой переменной
+X = [
+	[1] * len(table['median_house_value']),
+	table['longitude'],
+	table['latitude'],
+]  # матрица значений независимых переменных
+X_shtrih = transponate(X)  # транспонированная
+XX_shtrih = multiply(X, X_shtrih)  # перемножили
+XX_shtrih_minus1 = obrat(XX_shtrih)  # нашли обратную
+B = multiply(XX_shtrih_minus1, XX_shtrih)  # опять перемножили получили B
