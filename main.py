@@ -33,8 +33,49 @@ def multiply(X, Y):
 	return XY
 
 
-def obrat(X):
-	... # надо вспомнить
+def det(X):
+	if len(X) == 1:
+		return X[0][0]
+	if len(X) == 2:
+		return X[0][0] * X[1][1] - X[0][1] * X[1][0]
+	res = 0
+	for i in range(len(X)):
+		X_s = list()
+		for j in range(len(X)):
+			if i != j:
+				X_s.append(X[j][:])
+				X_s[-1].pop(0)
+		res += (-1) ** i * X[i][0] * det(X_s)
+	return res
+
+
+def alg_dops(X):
+	X_dops = [[0] * len(X) for _ in range(len(X))]
+	for i in range(len(X)):
+		for j in range(len(X)):
+			minor = []
+			for k in range(len(X)):
+				if k != i:
+					row = []
+					for m in range(len(X)):
+						if m != j:
+							row.append(X[k][m])
+					minor.append(row)
+			minor_det = det(minor)
+			X_dops[i][j] = (-1) ** (i + j) * minor_det
+	return X_dops
+
+
+def obrat(X):  # assert matrix is квадратная
+	X_det = det(X)
+	X_dops = alg_dops(X)
+	X_dops_T = transponate(X_dops)
+	res = list()
+	for i in range(len(X_dops_T)):
+		res.append([])
+		for j in range(len(X_dops_T)):
+			res[i].append(X_dops_T[i][j] / X_det)
+	return res
 
 
 dataset = list()
@@ -48,7 +89,9 @@ with open("california_housing_train.csv") as f:
 			dataset.append(list(map(float, s[i].split(';'))))
 		except:
 			invalid_cnt += 1
-
+if len(dataset) == 0:
+	print('Кривой файл, проверьте валидность и возвращайтесь')
+	exit(-1)
 if invalid_cnt > 0:
 	print(f'нашли {invalid_cnt} невалидных строк')
 else:
@@ -107,4 +150,7 @@ X = [
 X_shtrih = transponate(X)  # транспонированная
 XX_shtrih = multiply(X, X_shtrih)  # перемножили
 XX_shtrih_minus1 = obrat(XX_shtrih)  # нашли обратную
-B = multiply(XX_shtrih_minus1, XX_shtrih)  # опять перемножили получили B
+XS = list(sum(X[j][i] * S[i] for i in range(len(S))) for j in range(len(X)))
+B = list(sum(XX_shtrih_minus1[j][i] * XS[i] for i in range(len(XS))) for j in range(len(XX_shtrih_minus1)))
+# B = (XX')^-1 XS
+print(B)
