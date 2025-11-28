@@ -85,6 +85,7 @@ def obrat(X):  # assert matrix is квадратная
 	return res
 
 
+R2s = []
 dataset = list()
 header: list[str]
 invalid_cnt = 0
@@ -166,6 +167,7 @@ R2 = 1 - sum((predicted[i] - testing['median_house_value'][i]) ** 2 for i in ran
 	(testing['median_house_value'][i] - sum(testing['median_house_value']) / len(testing['median_house_value'])) ** 2
 	for i in range(len(testing['median_house_value'])))
 print(f'R^2 для зависимости от локации: {R2}')
+R2s.append(R2)
 
 # 1 - зависимость от возраста, площади всех комнат и площади спален (total_rooms, total_bedrooms, housing_median_age)
 S = learning['median_house_value']  # вектор наблюдений зависимой переменной
@@ -187,6 +189,7 @@ R2 = 1 - sum((predicted[i] - testing['median_house_value'][i]) ** 2 for i in ran
 	(testing['median_house_value'][i] - sum(testing['median_house_value']) / len(testing['median_house_value'])) ** 2
 	for i in range(len(testing['median_house_value'])))
 print(f'R^2 для зависимости от возраста, площади всех комнат и площади спален: {R2}')
+R2s.append(R2)
 
 # 1 - зависимость от ВСЕГО
 S = learning['median_house_value']  # вектор наблюдений зависимой переменной
@@ -218,3 +221,6 @@ R2 = 1 - sum((predicted[i] - testing['median_house_value'][i]) ** 2 for i in ran
 	(testing['median_house_value'][i] - sum(testing['median_house_value']) / len(testing['median_house_value'])) ** 2
 	for i in range(len(testing['median_house_value'])))
 print(f'R^2 для зависимости от всего: {R2}')
+R2s.append(R2)
+
+print(f'Лучшая зависимость - от {['локации', 'комнат и возраста', 'всего'][R2s.index(max(R2s))]} ({max(R2s)})')
