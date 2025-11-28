@@ -166,3 +166,55 @@ R2 = 1 - sum((predicted[i] - testing['median_house_value'][i]) ** 2 for i in ran
 	(testing['median_house_value'][i] - sum(testing['median_house_value']) / len(testing['median_house_value'])) ** 2
 	for i in range(len(testing['median_house_value'])))
 print(f'R^2 для зависимости от локации: {R2}')
+
+# 1 - зависимость от возраста, площади всех комнат и площади спален (total_rooms, total_bedrooms, housing_median_age)
+S = learning['median_house_value']  # вектор наблюдений зависимой переменной
+X = [
+	[1] * len(S),
+	learning['total_rooms'],
+	learning['total_bedrooms'],
+	learning['housing_median_age'],
+]  # матрица значений независимых переменных
+X_shtrih = transponate(X)  # транспонированная
+XX_shtrih = multiply(X, X_shtrih)  # перемножили
+XX_shtrih_minus1 = obrat(XX_shtrih)  # нашли обратную
+XS = list(sum(X[j][i] * S[i] for i in range(len(S))) for j in range(len(X)))  # умножаем на вектор
+B = list(sum(XX_shtrih_minus1[j][i] * XS[i] for i in range(len(XS))) for j in range(len(XX_shtrih_minus1)))  # сейм
+predicted = predict([testing['total_rooms'],
+					 testing['total_bedrooms'],
+					 testing['housing_median_age']], B)
+R2 = 1 - sum((predicted[i] - testing['median_house_value'][i]) ** 2 for i in range(len(predicted))) / sum(
+	(testing['median_house_value'][i] - sum(testing['median_house_value']) / len(testing['median_house_value'])) ** 2
+	for i in range(len(testing['median_house_value'])))
+print(f'R^2 для зависимости от возраста, площади всех комнат и площади спален: {R2}')
+
+# 1 - зависимость от ВСЕГО
+S = learning['median_house_value']  # вектор наблюдений зависимой переменной
+X = [
+	[1] * len(S),
+	learning['longitude'],
+	learning['latitude'],
+	learning['housing_median_age'],
+	learning['total_rooms'],
+	learning['total_bedrooms'],
+	learning['population'],
+	learning['households'],
+	learning['median_income'],
+]  # матрица значений независимых переменных
+X_shtrih = transponate(X)  # транспонированная
+XX_shtrih = multiply(X, X_shtrih)  # перемножили
+XX_shtrih_minus1 = obrat(XX_shtrih)  # нашли обратную
+XS = list(sum(X[j][i] * S[i] for i in range(len(S))) for j in range(len(X)))  # умножаем на вектор
+B = list(sum(XX_shtrih_minus1[j][i] * XS[i] for i in range(len(XS))) for j in range(len(XX_shtrih_minus1)))  # сейм
+predicted = predict([testing['longitude'],
+					 testing['latitude'],
+					 testing['housing_median_age'],
+					 testing['total_rooms'],
+					 testing['total_bedrooms'],
+					 testing['population'],
+					 testing['households'],
+					 testing['median_income'], ], B)
+R2 = 1 - sum((predicted[i] - testing['median_house_value'][i]) ** 2 for i in range(len(predicted))) / sum(
+	(testing['median_house_value'][i] - sum(testing['median_house_value']) / len(testing['median_house_value'])) ** 2
+	for i in range(len(testing['median_house_value'])))
+print(f'R^2 для зависимости от всего: {R2}')
