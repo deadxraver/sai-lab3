@@ -4,6 +4,13 @@ from random import shuffle
 import matplotlib.pyplot as plt
 
 
+def predict(X, B):
+	res = []
+	for i in range(len(X[0])):
+		res.append(B[0] + sum(X[j][i] * B[j + 1] for j in range(len(X))))
+	return res
+
+
 def calculate_quantile(data, q):
 	sorted_data = sorted(data)
 	n = len(sorted_data)
@@ -125,6 +132,7 @@ plt.legend()
 plt.show()
 
 # 3 razdeleniye
+s = [list(map(float, s[i].split(';'))) for i in range(len(s))]
 shuffle(s)
 learning_s = [s[i] for i in range(int(0.3 * len(s)), len(s))]
 shuffle(learning_s)
@@ -141,16 +149,20 @@ for i in range(len(header)):
 		learning[header[i]].append(learning_s[j][i])
 
 # 1 - зависимость от местоположения (longitude, latitude)
-S = table['median_house_value']  # вектор наблюдений зависимой переменной
+S = learning['median_house_value']  # вектор наблюдений зависимой переменной
 X = [
-	[1] * len(table['median_house_value']),
-	table['longitude'],
-	table['latitude'],
+	[1] * len(S),
+	learning['longitude'],
+	learning['latitude'],
 ]  # матрица значений независимых переменных
 X_shtrih = transponate(X)  # транспонированная
 XX_shtrih = multiply(X, X_shtrih)  # перемножили
 XX_shtrih_minus1 = obrat(XX_shtrih)  # нашли обратную
-XS = list(sum(X[j][i] * S[i] for i in range(len(S))) for j in range(len(X)))
-B = list(sum(XX_shtrih_minus1[j][i] * XS[i] for i in range(len(XS))) for j in range(len(XX_shtrih_minus1)))
+XS = list(sum(X[j][i] * S[i] for i in range(len(S))) for j in range(len(X)))  # умножаем на вектор
+B = list(sum(XX_shtrih_minus1[j][i] * XS[i] for i in range(len(XS))) for j in range(len(XX_shtrih_minus1)))  # сейм
 # B = (XX')^-1 XS
-print(B)
+predicted = predict([testing['longitude'], testing['latitude']], B)
+R2 = 1 - sum((predicted[i] - testing['median_house_value'][i]) ** 2 for i in range(len(predicted))) / sum(
+	(testing['median_house_value'][i] - sum(testing['median_house_value']) / len(testing['median_house_value'])) ** 2
+	for i in range(len(testing['median_house_value'])))
+print(f'R^2 для зависимости от локации: {R2}')
