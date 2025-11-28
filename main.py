@@ -105,6 +105,13 @@ if invalid_cnt > 0:
 else:
 	print('все строки валидны')
 
+# normalization:
+s = [list(map(float, s[i].split(';'))) for i in range(len(s))]
+mins = [min(s[i][j] for j in range(len(s[0]))) for i in range(len(s))]
+maxs = [max(s[i][j] for j in range(len(s[0]))) for i in range(len(s))]
+for i in range(len(s)):
+	s[i] = [(s[i][j] - mins[j]) / (maxs[j] - mins[j]) for j in range(len(s[i]))]
+
 table = {}
 for i in range(len(header)):
 	table[header[i]] = []
@@ -133,7 +140,6 @@ plt.legend()
 plt.show()
 
 # 3 razdeleniye
-s = [list(map(float, s[i].split(';'))) for i in range(len(s))]
 shuffle(s)
 learning_s = [s[i] for i in range(int(0.3 * len(s)), len(s))]
 shuffle(learning_s)
